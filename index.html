@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cronômetro de Estudos para Concursos</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col font-sans">
+
+    <!-- Navbar -->
+    <header class="bg-slate-800 border-b border-slate-700 py-4 px-6 shadow-md">
+        <div class="max-w-4xl mx-auto flex justify-between items-center">
+            <h1 class="text-xl font-bold flex items-center gap-2 text-indigo-400">
+                <i class="fa-solid fa-graduation-cap"></i> FocoConcurso
+            </h1>
+            <span class="text-sm bg-indigo-900/60 text-indigo-300 px-3 py-1 rounded-full border border-indigo-700">Modo Concurseiro</span>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="flex-grow max-w-4xl w-full mx-auto p-4 sm:p-6 grid gap-6">
+
+        <!-- Seção do Timer -->
+        <section class="bg-slate-800 border border-slate-700 rounded-2xl p-6 shadow-lg text-center flex flex-col items-center">
+            <h2 class="text-slate-400 text-sm font-semibold uppercase tracking-wider mb-2">Cronômetro de Estudo</h2>
+            
+            <!-- Seletor de Matéria -->
+            <div class="w-full max-w-md mb-6">
+                <label for="subjectInput" class="block text-xs font-medium text-slate-400 mb-1 text-left">Matéria / Tópico</label>
+                <input type="text" id="subjectInput" placeholder="Ex: Direito Constitucional, Matemática..." 
+                    class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-slate-100 focus:outline-none focus:border-indigo-500 transition">
+            </div>
+
+            <!-- Display do Relógio -->
+            <div id="timerDisplay" class="text-6xl sm:text-7xl font-ext500 font-mono tracking-widest text-indigo-400 my-4 drop-shadow">
+                00:00:00
+            </div>
+
+            <!-- Botões de Controle -->
+            <div class="flex flex-wrap justify-center gap-4 mt-4">
+                <button id="startBtn" onclick="startTimer()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-medium px-6 py-3 rounded-xl shadow transition flex items-center gap-2">
+                    <i class="fa-solid fa-play"></i> Iniciar
+                </button>
+                <button id="pauseBtn" onclick="pauseTimer()" class="bg-amber-600 hover:bg-amber-500 text-white font-medium px-6 py-3 rounded-xl shadow transition flex items-center gap-2" disabled>
+                    <i class="fa-solid fa-pause"></i> Pausar
+                </button>
+                <button id="stopBtn" onclick="stopTimer()" class="bg-rose-600 hover:bg-rose-500 text-white font-medium px-6 py-3 rounded-xl shadow transition flex items-center gap-2" disabled>
+                    <i class="fa-solid fa-stop"></i> Finalizar & Salvar
+                </button>
+            </div>
+        </section>
+
+        <!-- Seção de Estatísticas Rápidas -->
+        <section class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="bg-slate-800 border border-slate-700 rounded-xl p-4 flex items-center justify-between">
+                <div>
+                    <p class="text-slate-400 text-xs uppercase tracking-wider">Tempo Total Hoje</p>
+                    <p id="totalTimeToday" class="text-2xl font-bold text-slate-100 mt-1">0h 00m</p>
+                </div>
+                <div class="bg-indigo-500/10 p-3 rounded-lg text-indigo-400 border border-indigo-500/20">
+                    <i class="fa-solid fa-clock-rotate-left text-xl"></i>
+                </div>
+            </div>
+            <div class="bg-slate-800 border border-slate-700 rounded-xl p-4 flex items-center justify-between">
+                <div>
+                    <p class="text-slate-400 text-xs uppercase tracking-wider">Sessões Registradas</p>
+                    <p id="totalSessions" class="text-2xl font-bold text-slate-100 mt-1">0</p>
+                </div>
+                <div class="bg-emerald-500/10 p-3 rounded-lg text-emerald-400 border border-emerald-500/20">
+                    <i class="fa-solid fa-list-check text-xl"></i>
+                </div>
+            </div>
+        </section>
+
+        <!-- Histórico de Sessões -->
+        <section class="bg-slate-800 border border-slate-700 rounded-2xl p-6 shadow-lg">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="font-semibold text-slate-200">Histórico de Estudos Recentes</h3>
+                <button onclick="clearHistory()" class="text-xs text-rose-400 hover:text-rose-300 transition">Limpar Histórico</button>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="border-b border-slate-700 text-slate-400 text-xs uppercase">
+                            <th class="py-2 px-3">Data</th>
+                            <th class="py-2 px-3">Matéria</th>
+                            <th class="py-2 px-3">Duração</th>
+                            <th class="py-2 px-3 text-right">Ação</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historyTableBody" class="divide-y divide-slate-700/50 text-sm">
+                        <!-- Itens inseridos via JavaScript -->
+                    </tbody>
+                </table>
+                <div id="emptyState" class="text-center py-8 text-slate-500 text-sm">
+                    Nenhuma sessão registrada ainda. Comece a estudar!
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="text-center py-4 text-xs text-slate-500">
+        Desenvolvido para sua aprovação. Seus dados ficam salvos no seu navegador.
+    </footer>
+
+    <!-- Lógica em JavaScript -->
+    <script>
+        let timer = null;
+        let totalSeconds = 0;
+        let isRunning = false;
+
+        let sessions = JSON.parse(localStorage.getItem('study_sessions')) || [];
+
+        const timerDisplay = document.getElementById('timerDisplay');
+        const subjectInput = document.getElementById('subjectInput');
+        const startBtn = document.getElementById('startBtn');
+        const pauseBtn = document.getElementById('pauseBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const historyTableBody = document.getElementById('historyTableBody');
+        const emptyState = document.getElementById('emptyState');
+        const totalTimeTodayElem = document.getElementById('totalTimeToday');
+        const totalSessionsElem = document.getElementById('totalSessions');
+
+        function formatTime(secs) {
+            const hours = Math.floor(secs / 3600);
+            const minutes = Math.floor((secs % 3600) / 60);
+            const seconds = secs % 60;
+            return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        }
+
+        function updateDisplay() {
+            timerDisplay.textContent = formatTime(totalSeconds);
+        }
+
+        function startTimer() {
+            if (isRunning) return;
+            
+            isRunning = true;
+            startBtn.disabled = true;
+            startBtn.classList.replace('bg-emerald-600', 'bg-emerald-600/50');
+            pauseBtn.disabled = false;
+            stopBtn.disabled = false;
+            subjectInput.disabled = true;
+
+            timer = setInterval(() => {
+                totalSeconds++;
+                updateDisplay();
+            }, 1000);
+        }
+
+        function pauseTimer() {
+            if (!isRunning) return;
+
+            isRunning = false;
+            clearInterval(timer);
+            startBtn.disabled = false;
+            startBtn.classList.replace('bg-emerald-600/50', 'bg-emerald-600');
+            pauseBtn.disabled = true;
+        }
+
+        function stopTimer() {
+            if (totalSeconds === 0) {
+                resetState();
+                return;
+            }
+
+            const subject = subjectInput.value.trim() || "Estudo Geral";
+            const dateStr = new Date().toLocaleDateString('pt-BR');
+            const timeStr = formatTime(totalSeconds);
+
+            const newSession = {
+                id: Date.now(),
+                date: dateStr,
+                subject: subject,
+                durationSeconds: totalSeconds,
+                durationFormatted: timeStr
+            };
+
+            sessions.unshift(newSession);
+            localStorage.setItem('study_sessions', JSON.stringify(sessions));
+
+            resetState();
+            renderHistory();
+            updateStats();
+        }
+
+        function resetState() {
+            pauseTimer();
+            totalSeconds = 0;
+            updateDisplay();
+            subjectInput.value = '';
+            subjectInput.disabled = false;
+            stopBtn.disabled = true;
+            pauseBtn.disabled = true;
+            startBtn.disabled = false;
+        }
+
+        function deleteSession(id) {
+            sessions = sessions.filter(s => s.id !== id);
+            localStorage.setItem('study_sessions', JSON.stringify(sessions));
+            renderHistory();
+            updateStats();
+        }
+
+        function clearHistory() {
+            if (confirm("Deseja realmente apagar todo o histórico de estudos?")) {
+                sessions = [];
+                localStorage.removeItem('study_sessions');
+                renderHistory();
+                updateStats();
+            }
+        }
+
+        function renderHistory() {
+            historyTableBody.innerHTML = '';
+            if (sessions.length === 0) {
+                emptyState.classList.remove('hidden');
+                return;
+            }
+            emptyState.classList.add('hidden');
+
+            sessions.forEach(session => {
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-700/30 transition';
+                tr.innerHTML = `
+                    <td class="py-3 px-3 text-slate-400 text-xs">${session.date}</td>
+                    <td class="py-3 px-3 font-medium text-slate-200">${escapeHtml(session.subject)}</td>
+                    <td class="py-3 px-3 font-mono text-indigo-300">${session.durationFormatted}</td>
+                    <td class="py-3 px-3 text-right">
+                        <button onclick="deleteSession(${session.id})" class="text-slate-500 hover:text-rose-400 transition" title="Excluir">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                    </td>
+                `;
+                historyTableBody.appendChild(tr);
+            });
+        }
+
+        function updateStats() {
+            totalSessionsElem.textContent = sessions.length;
+
+            const today = new Date().toLocaleDateString('pt-BR');
+            const todaySeconds = sessions
+                .filter(s => s.date === today)
+                .reduce((acc, curr) => acc + curr.durationSeconds, 0);
+
+            const hours = Math.floor(todaySeconds / 3600);
+            const minutes = Math.floor((todaySeconds % 3600) / 60);
+            totalTimeTodayElem.textContent = `${hours}h ${String(minutes).padStart(2, '0')}m`;
+        }
+
+        function escapeHtml(text) {
+            const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+            return text.replace(/[&<>"']/g, m => map[m]);
+        }
+
+        // Inicializa dados salvos ao carregar
+        renderHistory();
+        updateStats();
+    </script>
+</body>
+</html>
+```eof
